@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "identityapp1": {
+      "connectionInfo": "App registration: BlazorApp5WASM, Tenant: Default Directory (julioguzmanoutlook554.onmicrosoft.com - Microsoft Entra ID)",
+      "secretStore": "LocalSecretsFile",
+      "type": "identityapp.secretStore",
+      "connectionId": "AzureAD:ClientSecret"
+    }
+  }
+}

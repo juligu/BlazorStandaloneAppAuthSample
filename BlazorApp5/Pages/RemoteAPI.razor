@@ -1,0 +1,55 @@
+﻿@page "/RemoteApi"
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+<h3>RemoteAPI</h3>
+@inject HttpClient httpClient
+
+A @AccessToken
+_
+
+@if (Items == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @foreach (TestData item in Items)
+    {
+        <li>@item.Id: @item.Name</li>
+    }
+}
+
+
+@code {
+    public List<TestData> Items { get; set; }
+
+    [Inject]
+    public IAccessTokenProvider accessTokenProvider { get; set; }
+    public string AccessToken { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await accessTokenProvider.RequestAccessToken(
+            new AccessTokenRequestOptions()
+                {
+                    Scopes =
+                            [""]
+                });
+
+        if (result.TryGetToken(out var token))
+        {
+            AccessToken = token.Value;
+            httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Value);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+            "GetDataSecond");
+            var response = await httpClient.SendAsync(requestMessage);
+
+            response.EnsureSuccessStatusCode();
+
+            Items = await JsonSerializer.DeserializeAsync<List<TestData>>(
+               await response.Content.ReadAsStreamAsync()) ?? [];
+        }
+    }
+}
